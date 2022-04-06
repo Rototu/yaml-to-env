@@ -10,7 +10,7 @@ cargo install --path .
 
 ## Instructions for how to run
 
-Make sure you have a config file (.txt) with the paths to all the YAML files you want to pull values from.
+Make sure you have a config file with the paths to all the YAML files you want to pull values from.
 Then run
 
 ```[bash]
