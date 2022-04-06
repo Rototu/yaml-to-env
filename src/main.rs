@@ -75,9 +75,14 @@ fn create_env_hashmap(
         let file = std::fs::read_to_string(path).expect(create_yaml_file_read_err(path).as_str());
 
         // read yaml lines and transform into collection of key value pairs
-        let parsed_line_key_val_pairs = file.lines().map(|l| match l.split_once(':') {
-            Some((key, value)) => Some((String::from(key), String::from(value))),
-            None => None,
+        let parsed_line_key_val_pairs = file.lines().map(|l| {
+            if l.starts_with('#') {
+                return Some((String::from(""), String::from("")));
+            }
+            match l.split_once(':') {
+                Some((key, value)) => Some((String::from(key), String::from(value))),
+                None => None,
+            }
         });
 
         // throw err if any line could not be split into two on ':' char
@@ -89,10 +94,12 @@ fn create_env_hashmap(
             return Err(err);
         }
 
+        let non_empty_key_val_iter = parsed_line_key_val_pairs
+            .map(|option| option.unwrap())
+            .filter(|(k, v)| !k.is_empty() && !v.is_empty());
+
         // add key value pairs to hashmap
-        env_hash_map.extend(
-            parsed_line_key_val_pairs.map(|res| res.unwrap_or((String::new(), String::new()))),
-        )
+        env_hash_map.extend(non_empty_key_val_iter)
     }
 
     Ok(env_hash_map)
